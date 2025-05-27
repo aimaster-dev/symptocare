@@ -1,6 +1,3 @@
-Absolutely! Here’s an improved `README.md` tailored for a **React + Flask** project, with clear sections for running the frontend and backend individually, plus extra helpful details for contributors and users.
-
----
 
 # SymptoCare
 
