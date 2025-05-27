@@ -1,9 +1,5 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { InnerLayout } from '../../styles/Layouts';
-import SymptomAnalysis from '../SymptomAnalysis/SymptomAnalysis';
-import MentalWellness from '../MentalWellness/MentalWellness';
-import ConsultDoctor from '../ConsultDoctor/ConsultDoctor';
 import hero from '../../img/hero.png'
 
 function Home({ updateActive }) {
@@ -38,9 +34,9 @@ function Home({ updateActive }) {
         <HeroSection>
           <div className='hero'>
             <div className='des'>
-            <h3>Heal Smart:</h3>
-            <h1>Take Charge of Your Health, Mind & Body</h1>
-            <p>Feeling under the weather and not sure what's wrong? Don't worry, HealSmart is here to be your friendly health detective!</p>
+            <h3>SymptoCare:</h3>
+            <h1>For when your brain needs a break and your body wants a high five.</h1>
+            <p>Not feeling your best and can’t quite put your finger on it? No worries – SymptoCare is on the case, like a health detective in comfy shoes!</p>
             </div>
             <div className='des'>
               <img src={hero} alt=''></img>

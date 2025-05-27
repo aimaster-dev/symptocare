@@ -10,7 +10,7 @@ function Navigation({active, setActive}) {
         <div className="user-con">
             <img src={avatar} alt="loading" />
             <div className="text">
-                <p>HealSmart</p>
+                <p>SymptoCare</p>
             </div>
         </div>
         <ul className="menu-items">

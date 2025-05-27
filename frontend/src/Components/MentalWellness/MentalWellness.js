@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 import { InnerLayout } from '../../styles/Layouts';
 import send_icon from '../../img/send_icon.png'
@@ -9,6 +9,8 @@ import { Context } from '../../context/Context';
 function MentalWellness() {
   const {onSent,recentPrompt,showResult,loading,resultData,setInput,input} = useContext(Context)
 
+  const [selectedModel, setSelectedModel] = useState("openai");
+
   return (
     <MentStyled>
       <InnerLayout className='main'>
@@ -16,6 +18,17 @@ function MentalWellness() {
           <h2>Mind-Bot</h2>
         </div>
         <div className="main-container">
+          <div className="model-select-box">
+            <label htmlFor="modelSelect">🧠 Select Model:</label>
+            <select
+              id="modelSelect"
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+            >
+              <option value="gemini">Gemini</option>
+              <option value="chatgpt">ChatGPT</option>
+            </select>
+          </div>
           {!showResult
           ?<>
             <div className='greet'>
@@ -157,8 +170,17 @@ const MentStyled = styled.nav`
     overflow-y: scroll;
   }
 
-  .result::-webkit-scrollbar{
-    display: none;
+  .result::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .result::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  .result::-webkit-scrollbar-track {
+    background: #f1f1f1;
   }
 
   .result-title{

@@ -1,10 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { InnerLayout } from "../../styles/Layouts";
-import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
-import { db } from "../../firebase";
-import { collection, getDocs } from "firebase/firestore";
 
 const times = [
     { "id": 1, "time": "10:00 AM", "available": true },
@@ -16,12 +13,14 @@ const times = [
   
 
 function DoctorDetails({ DoctorDet }) {
-  const [disable, setDisable] = useState(false);
-  const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedTimeId, setSelectedTimeId] = useState(null);
+  const [alertShown, setAlertShown] = useState(false);
 
   const handleBookNow = (time) => {
-    setSelectedTime(time);
-    console.log("Book Now clicked for time:", time);
+    setSelectedTimeId(time.id);
+    setAlertShown(true);
+    setTimeout(() => setAlertShown(false), 2000); // optional auto-hide
+    console.log("Booked:", time.time);
   };
 
   return (
@@ -33,7 +32,7 @@ function DoctorDetails({ DoctorDet }) {
             <img
               class="w-24 h-24 mb-3 rounded-full shadow-lg"
               src={DoctorDet.imageUri}
-              alt="Bonnie image"
+              alt="Doctor Bonnie"
             />
             <h5 class="mb-1 text-xl font-medium text-gray-900">
               {DoctorDet.name}
@@ -55,6 +54,11 @@ function DoctorDetails({ DoctorDet }) {
         </div>
 
         <div className="w-full max-w-md mx-auto mt-8 rounded-lg">
+          {alertShown && (
+            <div className="mb-4 text-green-600 font-semibold text-center">
+              ✅ Appointment booked successfully!
+            </div>
+          )}
       <table className="min-w-full">
         <thead>
           <tr>
@@ -75,14 +79,17 @@ function DoctorDetails({ DoctorDet }) {
                 {time.available ? "Available" : "Not Available"}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {time.available && (
-                  <button
-                    onClick={() => handleBookNow(time)}
-                    className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full"
-                  >
-                    Book Now
-                  </button>
-                )}
+                {time.available && selectedTimeId !== time.id && (
+                      <button
+                        onClick={() => handleBookNow(time)}
+                        className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full"
+                      >
+                        Book Now
+                      </button>
+                    )}
+                    {selectedTimeId === time.id && (
+                      <span className="text-green-600 font-medium">Booked</span>
+                    )}
               </td>
             </tr>
           ))}

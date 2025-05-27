@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import runChat from "../config/gemini";
+import runChat from "../config/runChat";
 
 export const AIContext = createContext();
 
@@ -10,6 +10,7 @@ const AIContextProvider = (props) => {
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resultData, setResultData] = useState("");
+  const [provider, setProvider] = useState("openai");
 
   const delayPara = (index, nextWord) => {
     setTimeout(function () {
@@ -18,13 +19,14 @@ const AIContextProvider = (props) => {
   };
 
   const onSent = async (prompt) => {
+    const query = input || prompt;
     setInput("");
     setResultData("");
     setLoading(true);
     setShowResult(true);
     setRecentPrompt(input || prompt);
     setPrevPrompts([...prevPrompts, input || prompt]);
-    const response = await runChat(input || prompt);
+    const response = await runChat(query, provider);
     console.log("recentPrompt", recentPrompt || prompt);
     console.log("resultData", resultData);
     console.log("prevPrompts", prevPrompts);
@@ -38,12 +40,8 @@ const AIContextProvider = (props) => {
         newResponse += "<b>" + responseArray[i] + "</b>";
       }
     }
-    let newResponse2 = newResponse.split("*").join("</br>");
-    let newResponseArray = newResponse2.split(" ");
-    for (let i = 0; i < newResponseArray.length; i++) {
-      const nextWord = newResponseArray[i];
-      delayPara(i, nextWord + " ");
-    }
+    let formatted = newResponse.split("*").join("</br>").split(" ");
+    formatted.forEach((word, i) => delayPara(i, word + " "));
     setLoading(false);
   };
 
@@ -58,6 +56,8 @@ const AIContextProvider = (props) => {
     resultData,
     input,
     setInput,
+    provider,
+    setProvider,
   };
 
   return (

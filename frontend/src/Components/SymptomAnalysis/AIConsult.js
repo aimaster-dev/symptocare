@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { InnerLayout } from "../../styles/Layouts";
 import send_icon from "../../img/send_icon.png";
@@ -17,9 +17,11 @@ function AIConsult({ symptoms, diagnosis }) {
     input,
   } = useContext(AIContext);
 
+   const [selectedModel, setSelectedModel] = useState("gemini");
+
   let symp = "";
   for (let sym in symptoms) {
-    symp = symp + " " + symptoms[sym];
+    symp = symp + " " + sym + ":" + symptoms[sym];
   }
 
   let prompt = `
@@ -33,6 +35,7 @@ function AIConsult({ symptoms, diagnosis }) {
   useEffect(() => {
     setInput(prompt);
     onSent(prompt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -42,6 +45,16 @@ function AIConsult({ symptoms, diagnosis }) {
           <h3>AI Consultation</h3>
         </div>
         <div className="main-container">
+          <div className="model-select">
+            <label htmlFor="modelSelect">🧠 Select AI Model:</label>
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+            >
+              <option value="gemini">Gemini</option>
+              <option value="chatgpt">ChatGPT</option>
+            </select>
+          </div>
           {!showResult ? (
             <>
               <div className="greet">
@@ -91,6 +104,43 @@ function AIConsult({ symptoms, diagnosis }) {
 }
 
 const MentStyled = styled.nav`
+  .model-select-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 30px 0;
+    padding: 12px 18px;
+    background: #f8f4ff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    max-width: 300px;
+  }
+
+  .model-select-box label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #5f4b8b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .model-select-box select {
+    padding: 8px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    border: 2px solid #dcd3f7;
+    border-radius: 8px;
+    background: white;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .model-select-box select:hover,
+  .model-select-box select:focus {
+    border-color: #a674f8;
+  }
   .nav h3 {
     color: darkviolet;
     padding: 2px 4px;

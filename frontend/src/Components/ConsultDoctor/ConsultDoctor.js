@@ -48,12 +48,32 @@ function ConsultDoctor({ updateFilter }) {
   console.log(doctors);
   const filters = [
     "Dermatologist",
+    "Cardiologist",
     "Endocrinologist",
     "Gastroenterologist",
     "Rheumatologist",
     "Neurologist",
     "Pulmonologist",
-    "Cardiologist",
+    "Psychiatrist",
+    "Oncologist",
+    "Nephrologist",
+    "Infectious Disease Specialist",
+    "Hematologist",
+    "Immunologist",
+    "Ophthalmologist",
+    "ENT Specialist",
+    "Orthopedic Surgeon",
+    "General Surgeon",
+    "Urologist",
+    "Gynecologist",
+    "Pediatrician",
+    "General Practitioner",
+    "Allergist",
+    "Hepatologist",
+    "Hematologist-Oncologist",
+    "Internal Medicine Specialist",
+    "Endocrine Surgeon",
+    "Colorectal Surgeon"
   ];
 
   const handleFilterChange = (event) => {

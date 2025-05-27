@@ -1,96 +1,33 @@
+// Updated SymptomAnalysis UI to match the provided image layout and use pink color styling
+
 import React, { useState, useContext } from "react";
 import styled from "styled-components";
-import { InnerLayout } from "../../styles/Layouts";
+import { FilterContext } from "../../context/FilterContext";
 import AIConsult from "./AIConsult";
 import { notes } from "../../utils/Icons";
-import { FilterContext } from "../../context/FilterContext";
-import { AIContext } from "../../context/AIContext";
+import DiseaseMapping from '../../config/disease.json'
 
-let DiseaseMapping = {
-  Psoriasis: "Dermatologist",
-
-  Impetigo: "Dermatologist",
-
-  "Heart Attack": "Cardiologist",
-
-  Hypertension: "Cardiologist",
-
-  Diabetes: "Endocrinologist",
-
-  Hypothyroidism: "Endocrinologist",
-
-  Gastroenteritis: "Gastroenterologist",
-
-  Jaundice: "Gastroenterologist",
-
-  Osteoarthristis: "Rheumatologist",
-
-  "Cervical spondylosis": "Neurologist",
-
-  "(vertigo) Paroymsal  Positional Vertigo": "Neurologist",
-
-  "Bronchial Asthma": "Pulmonologist",
-};
-
-function SymptomAnalysis({ updateActive }) {
-  const { doctorSpec, setDoctorSpec } = useContext(FilterContext);
-
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+const SymptomAnalysis = ({ updateActive }) => {
+  const { setDoctorSpec } = useContext(FilterContext);
   const [submitted, setSubmitted] = useState(false);
   const [diagnosis, setDiagnosis] = useState("undefined");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredSymptoms, setFilteredSymptoms] = useState([]);
+  const [outcome, setOutcome] = useState(false);
   const [consultAI, setConsultAI] = useState(false);
 
-  // Function to handle selection of symptoms
-  const handleSelectSymptom = (symptom) => {
-    if (!selectedSymptoms.includes(symptom)) {
-      setSelectedSymptoms([...selectedSymptoms, symptom]);
-    }
-  };
+  const [formData, setFormData] = useState({
+    fever: "Yes",
+    cough: "Yes",
+    fatigue: "Yes",
+    difficulty_breathing: "Yes",
+    age: 25,
+    gender: "Male",
+    blood_pressure: "Low",
+    cholesterol: "Normal"
+  });
 
-  // Function to handle removal of selected symptom
-  const handleRemoveSymptom = (symptomToRemove) => {
-    const updatedSymptoms = selectedSymptoms.filter(
-      (symptom) => symptom !== symptomToRemove
-    );
-    setSelectedSymptoms(updatedSymptoms);
-  };
-
-  // Function to handle submission
-  const handleSubmit = () => {
-    console.log("Selected symptoms:", selectedSymptoms);
-
-    const data = {
-      symptoms: selectedSymptoms,
-    };
-
-    const url = "https://heal-smart-server.onrender.com/predict";
-
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    };
-
-    fetch(url, options)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Response:", data);
-        setDiagnosis(data.prediction);
-      })
-      .catch((error) => {
-        console.error("There was a problem with your fetch operation:", error);
-      });
-
-    setSubmitted(true);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleConsultDoctor = () => {
@@ -101,180 +38,194 @@ function SymptomAnalysis({ updateActive }) {
     }
     updateActive(4);
   };
+
   const handleConsultAI = () => {
     setConsultAI(true);
   };
 
-  const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value);
-    const filtered = symptoms.filter((symptom) =>
-      symptom.toLowerCase().includes(e.target.value.toLowerCase())
-    );
-    setFilteredSymptoms(filtered);
+  const handleSliderChange = (e) => {
+    setFormData({ ...formData, age: parseInt(e.target.value) });
   };
 
-  // Mocked symptom data
-  const symptoms = [
-    "abdominal_pain",
-    "abnormal_menstruation",
-    "altered_sensorium",
-    "back_pain",
-    "belly_pain",
-    "bladder_discomfort",
-    "blister",
-    "breathlessness",
-    "brittle_nails",
-    "burning_micturition",
-    "chest_pain",
-    "continuous_feel_of_urine",
-    "cough",
-    "dark_urine",
-    "dehydration",
-    "depression",
-    "diarrhoea",
-    "dischromic_patches",
-    "enlarged_thyroid",
-    "family_history",
-    "fatigue",
-    "foul_smell_ofurine",
-    "headache",
-    "hip_joint_pain",
-    "increased_appetite",
-    "inflammatory_nails",
-    "internal_itching",
-    "irritability",
-    "itching",
-    "joint_pain",
-    "knee_pain",
-    "lack_of_concentration",
-    "loss_of_balance",
-    "loss_of_smell",
-    "mucoid_sputum",
-    "muscle_pain",
-    "nausea",
-    "painful_walking",
-    "passage_of_gases",
-    "polyuria",
-    "red_sore_around_nose",
-    "red_spots_over_body",
-    "rusty_sputum",
-    "silver_like_dusting",
-    "skin_peeling",
-    "skin_rash",
-    "small_dents_in_nails",
-    "spinning_movements",
-    "spotting_urination",
-    "sunken_eyes",
-    "swelling_joints",
-    "swollen_extremeties",
-    "toxic_look_(typhos)",
-    "unsteadiness",
-    "vomiting",
-    "watering_from_eyes",
-    "weakness_in_limbs",
-    "weakness_of_one_body_side",
-    "yellow_crust_ooze",
-    "yellowish_skin",
-  ];
+  const handleSubmit = () => {
+    console.log("Submitted Data:", formData);
+    // Send to backend here
+    const url = "http://127.0.0.1:5000/predict";
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    };
+    fetch(url, options)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Response:", data);
+        setDiagnosis(data.disease);
+        setOutcome(data.status)
+
+      })
+      .catch((error) => {
+        console.error("There was a problem with your fetch operation:", error);
+      });
+
+    setSubmitted(true);
+  };
 
   return (
     <>
-      {!submitted && (
-        <SymptomAnalysisStyled>
-          <div className="heading">
-            <h2>Symptom Analysis</h2>
-          </div>
-          <div className="desc">
-            <p>
-              Experience instant clarity with our Symptom Analysis feature. Just
-              enter your symptoms, and within moments, receive precise
-              recommendations and insights tailored to you.{" "}
-            </p>
-          </div>
-          <div className="boxi">
-            <SearchBar
-              type="text"
-              placeholder="Search your symptoms"
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-            />
-            {searchQuery.length > 1 && (
-              <SymptomList>
-                {filteredSymptoms.map((symptom, index) => (
-                  <SymptomItem
-                    key={index}
-                    onClick={() => handleSelectSymptom(symptom)}
-                  >
-                    {symptom}
-                  </SymptomItem>
-                ))}
-              </SymptomList>
-            )}
-            <SelectedSymptoms>
-              {selectedSymptoms.map((symptom, index) => (
-                <SelectedSymptom key={index}>
-                  {symptom}
-                  <RemoveButton onClick={() => handleRemoveSymptom(symptom)}>
-                    X
-                  </RemoveButton>
-                </SelectedSymptom>
-              ))}
-            </SelectedSymptoms>
-            <SubmitButton
-              className="bg-purple-500 mt-2 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full"
-              onClick={handleSubmit}
+        {!submitted && (<FormContainer>
+        <h2>Please fill out the form below:</h2>
+        <FormGrid>
+            <FormGroup>
+            <label>Fever</label>
+            <Select name="fever" value={formData.fever} onChange={handleChange}>
+                <option>Yes</option>
+                <option>No</option>
+            </Select>
+            </FormGroup>
+            <FormGroup>
+            <label>Age</label>
+            <SliderContainer>
+                <Slider
+                type="range"
+                min="0"
+                max="100"
+                value={formData.age}
+                onChange={handleSliderChange}
+                />
+                <AgeLabel>{formData.age}</AgeLabel>
+            </SliderContainer>
+            </FormGroup>
+            <FormGroup>
+            <label>Cough</label>
+            <Select name="cough" value={formData.cough} onChange={handleChange}>
+                <option>Yes</option>
+                <option>No</option>
+            </Select>
+            </FormGroup>
+            <FormGroup>
+            <label>Gender</label>
+            <Select name="gender" value={formData.gender} onChange={handleChange}>
+                <option>Male</option>
+                <option>Female</option>
+            </Select>
+            </FormGroup>
+            <FormGroup>
+            <label>Fatigue</label>
+            <Select name="fatigue" value={formData.fatigue} onChange={handleChange}>
+                <option>Yes</option>
+                <option>No</option>
+            </Select>
+            </FormGroup>
+            <FormGroup>
+            <label>Blood Pressure</label>
+            <Select name="blood_pressure" value={formData.blood_pressure} onChange={handleChange}>
+                <option>Low</option>
+                <option>Normal</option>
+                <option>High</option>
+            </Select>
+            </FormGroup>
+            <FormGroup>
+            <label>Difficulty Breathing</label>
+            <Select
+                name="difficulty_breathing"
+                value={formData.difficulty_breathing}
+                onChange={handleChange}
             >
-              Analyze
-            </SubmitButton>
-          </div>
-        </SymptomAnalysisStyled>
-      )}
-      {submitted && !consultAI && (
+                <option>Yes</option>
+                <option>No</option>
+            </Select>
+            </FormGroup>
+            <FormGroup>
+            <label>Cholesterol Level</label>
+            <Select
+                name="cholesterol"
+                value={formData.cholesterol}
+                onChange={handleChange}
+            >
+                <option>Low</option>
+                <option>Normal</option>
+                <option>High</option>
+            </Select>
+            </FormGroup>
+        </FormGrid>
+        <SubmitButton onClick={handleSubmit}>Predict Disease</SubmitButton>
+        </FormContainer>)}
+        {submitted && !consultAI && (
         <Divv>
         <div className="head">
-        Analysis report:
-      </div>
-        <Diagnosis>
-          <Dig>
-            <p>{notes}</p>
-            {diagnosis != "undefined" ? (
-              <>
-                <p>
-                  It seems like you may be experiencing symptoms of{" "}
-                  <strong>{diagnosis}</strong>.
-                </p>
-                <p>Please consult a {DiseaseMapping[diagnosis]}.</p>
-              </>
-            ) : (
-              "Your symptoms do not match any disease. Please consult a doctor."
-            )}
-          </Dig>
-          <div className="consultation-options">
-            <div className="consultation-option">
-              <p>Would you like assistance in finding a doctor nearby?</p>
-              <ConsultDoctorButton onClick={handleConsultDoctor}>
-                Yes, please find me a doctor
-              </ConsultDoctorButton>
-            </div>
-            <div className="consultation-option">
-              <p>Would you like any AI assistance regarding your symptoms?</p>
-              <ConsultAI onClick={handleConsultAI}>
-                Yes, get me AI assistance
-              </ConsultAI>
-            </div>
-          </div>
-        </Diagnosis>
-        </Divv>
+            Analysis report:
+        </div>
+            <Diagnosis>
+                {outcome && (<Dig>
+                    <p>{notes}</p>
+                    {diagnosis != "undefined" ? (
+                    <>
+                        <p>
+                            The predicted outcome is: Positive
+                        </p>
+                        <p>
+                        It seems like you may be experiencing symptoms of{" "}
+                        <strong>{diagnosis}</strong>.
+                        </p>
+                        <p>Please consult a {DiseaseMapping[diagnosis]}.</p>
+                    </>
+                    ) : (
+                    "Your symptoms do not match any disease. Please consult a doctor."
+                    )}
+                </Dig>)}
+                {!outcome && (<Dig>
+                    <p>{notes}</p>
+                        <p>
+                            Your symptoms do not match any disease. Please consult a doctor.
+                        </p>
+                </Dig>)}
+                <div className="consultation-options">
+                    <div className="consultation-option">
+                    <p>Would you like assistance in finding a doctor nearby?</p>
+                    <ConsultDoctorButton onClick={handleConsultDoctor}>
+                        Yes, please find me a doctor
+                    </ConsultDoctorButton>
+                    </div>
+                    <div className="consultation-option">
+                    <p>Would you like any AI assistance regarding your symptoms?</p>
+                    <ConsultAI onClick={handleConsultAI}>
+                        Yes, get me AI assistance
+                    </ConsultAI>
+                    </div>
+                </div>
+                </Diagnosis>
+            </Divv>
       )}
       {consultAI && (
         <AIConsult
-          symptoms={selectedSymptoms}
+          symptoms={formData}
           diagnosis={diagnosis}
         ></AIConsult>
       )}
     </>
   );
-}
+};
+
+const FormContainer = styled.div`
+  padding: 40px;
+  color: #333;
+  border-radius: 8px;
+  max-width: 800px;
+  margin: 0 auto;
+  h2 {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+`;
 
 const Divv = styled.div`
   .head{
@@ -285,102 +236,62 @@ const Divv = styled.div`
   }
 `;
 
+const FormGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+`;
 
-const SymptomAnalysisStyled = styled.div`
-  .heading h2 {
-    font-size: 29px;
-    color: darkviolet;
-    font-weight: 605;
-    margin: 25px 20px;
-    padding: 1rem 1.5rem;
-    width: 100%;
-  }
-
-  .desc {
-    margin: 45px 45px;
-    display: flex;
-    align-items: center;
-    color: #222260;
-    font-weight: 400;
-    font-size: 20px;
-  }
-  .boxi{
-    margin:50px 50px;
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  label {
+    margin-bottom: 8px;
+    color: #101010;
+    font-size: 14px;
   }
 `;
 
-const SearchBar = styled.input`
+const Select = styled.select`
+  background-color:rgb(163, 42, 233);
+  color: #fff;
   padding: 10px;
-  margin-bottom: 20px;
-  width: 100%;
-  box-sizing: border-box;
-  color: purple;
-  background-color: #e6d6fa;
-  border: 1.3px solid rgb(168 85 247);
-  border-radius: 0.375rem;
-`;
-
-const SymptomList = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-content: space-around;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const SymptomItem = styled.div`
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 400;
-  border: 1px solid rgb(165 85 247);
-  background-color: darkviolet;
-  border-radius: 10px;
-  padding: 9px;
-  color: white;
-  margin: 6px;
-`;
-
-const SelectedSymptoms = styled.div`
-  min-height: 50px;
-  margin: 5px;
-  margin-top: 20px;
-  color: purple;
-  border: 1.3px solid rgb(168 85 247);
-  display: flex;
-  flex-wrap: wrap;
-  border-radius: 0.375rem;
-  justify-content: flex-start;
-  align-content: space-around;
-  align-items: center;
-`;
-
-const SelectedSymptom = styled.span`
-  margin: 5px;
-  padding: 5px;
-  font-size: 15px;
-  font-weight: 400;
-  border: 1px solid rgb(165 85 247);
-  border-radius: 5px;
-`;
-
-const RemoveButton = styled.button`
-  margin-left: 5px;
-  padding: 3px;
-  /* background-color: green; */
+  border-radius: 8px;
   border: none;
-  color: darkblue;
-  border-radius: 999px;
-  cursor: pointer;
+  font-size: 16px;
+`;
+
+const SliderContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const Slider = styled.input`
+  width: 100%;
+  margin-right: 10px;
+  accent-color: #f472b6;
+`;
+
+const AgeLabel = styled.span`
+  color: #f472b6;
+  font-weight: bold;
+  font-size: 16px;
 `;
 
 const SubmitButton = styled.button`
-  padding: 10px 20px;
+  margin-top: 40px;
+  padding: 12px 24px;
+  background-color: #f472b6;
   color: #fff;
   border: none;
-  border-radius: 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  display: block;
-  margin: 50px auto;
+
+  &:hover {
+    background-color: #ec4899;
+  }
 `;
 
 const Diagnosis = styled.div`
