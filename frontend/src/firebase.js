@@ -7,7 +7,6 @@ import { getFirestore } from "firebase/firestore";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAniOiO6bXl6yPwhd4ZFea7I0Xm7vMLFPQ",
   authDomain: "health-app-2058e.firebaseapp.com",
