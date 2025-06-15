@@ -15,7 +15,7 @@ with open('assets/outcome_model.pkl', 'rb') as f:
     outcome_model = pickle.load(f)
 
 with open('assets/disease_model.pkl', 'rb') as f:
-    disease_model = pickle.load(f)
+    disease_model = pickle.load(f) 
 
 # Welcome GET Request API
 @app.route('/', methods=['GET'])
