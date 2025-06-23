@@ -11,7 +11,7 @@ root.render(
   <ContextProvider>
     <AIContextProvider>
       <FilterContextProvider>
-        <GlobalStyle />
+        <GlobalStyle /> 
         <App />
       </FilterContextProvider>
     </AIContextProvider>
